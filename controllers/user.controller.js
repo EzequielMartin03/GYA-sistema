@@ -2,116 +2,89 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../models/user.model.js";
 
+// Registro de usuario
 const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { nombre, contrasena } = req.body;
 
-    if (!username || !email || !password) {
-      return res.status(400).json({
-        ok: false,
-        msg: "Missing data",
-      });
+    if (!nombre || !contrasena) {
+      return res.status(400).json({ ok: false, msg: "Faltan datos" });
     }
 
-    const user = await UserModel.findOneByEmail(email);
-
-    if (user) {
-      return res.status(409).json({ ok: false, msg: "Email already exist" });
+    // Verificar si ya existe el usuario
+    const existingUser = await UserModel.findOneByNombre(nombre);
+    if (existingUser) {
+      return res.status(409).json({ ok: false, msg: "El usuario ya existe" });
     }
 
+    // Hashear contraseña
     const salt = await bcryptjs.genSalt(10);
-    const hashedPassword = await bcryptjs.hash(password, salt);
+    const hashedPassword = await bcryptjs.hash(contrasena, salt);
 
+    // Crear usuario
     const newUser = await UserModel.create({
-      email,
-      password: hashedPassword,
-      username,
+      nombre,
+      contrasena: hashedPassword,
     });
 
-    const token = jwt.sign(
-      {
-        email: newUser.email,
+    return res.status(201).json({
+      ok: true,
+      msg: "Usuario registrado correctamente",
+      usuario: {
+        id_usuario: newUser.id_usuario,
+        nombre: newUser.nombre,
       },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      }
-    );
-
-    return res.status(201).json({ ok: true, token: token });
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({
-      ok: false,
-      msg: "Error server",
-    });
+    return res.status(500).json({ ok: false, msg: "Error en el servidor" });
   }
 };
 
+// Login de usuario
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { nombre, contrasena } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        ok: false,
-        msg: "Missing data",
-      });
+    if (!nombre || !contrasena) {
+      return res.status(400).json({ ok: false, msg: "Faltan datos" });
     }
 
-    const user = await UserModel.findOneByEmail(email);
+    // Buscar usuario
+    const user = await UserModel.findOneByNombre(nombre);
 
     if (!user) {
-      return res.status(404).json({
-        error: "User not found",
-      });
+      return res.status(404).json({ ok: false, msg: "Usuario no encontrado" });
     }
 
-    const isMatch = await bcryptjs.compare(password, user.password);
-
+    // Verificar contraseña
+    const isMatch = await bcryptjs.compare(contrasena, user.contrasena);
     if (!isMatch) {
-      return res.status(401).json({
-        error: "Invalid credentials",
-      });
+      return res.status(401).json({ ok: false, msg: "Credenciales inválidas" });
     }
 
+    // Generar token JWT
     const token = jwt.sign(
       {
-        email: user.email,
+        id_usuario: user.id_usuario,
+        nombre: user.nombre,
       },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "1h",
-      }
+      { expiresIn: "1h" }
     );
 
-    return res.json({ ok: true, token: token });
+    return res.json({
+      ok: true,
+      msg: "Login exitoso",
+      token,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({
-      ok: false,
-      msg: "Error server",
-    });
+    return res.status(500).json({ ok: false, msg: "Error en el servidor" });
   }
 };
-
-const profile = async(req,res) => {
-    try {
-        
-       const user = await UserModel.findOneByEmail(req.email)
-       return res.json({ok: true, msg: user})
-
-    } catch (error) {
-        console.log(error);
-    return res.status(500).json({
-      ok: false,
-      msg: "Error server",
-    });    
-    }
-}
 
 export const UserController = {
   register,
   login,
-  profile,
 };

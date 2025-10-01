@@ -1,11 +1,9 @@
-import {Router} from "express"
-import { UserController } from "../controllers/user.controller.js"
-import { verifyToken } from "../middlewares/jwt.middleware.js"
+import { Router } from "express";
+import { UserController } from "../controllers/user.controller.js";
 
-const router = Router()
+const router = Router();
 
-router.post('/register', UserController.register)
-router.post('/login', UserController.login)
-router.get('/profile', verifyToken, UserController.profile)
+router.post('/register', UserController.register);
+router.post('/login', UserController.login);
 
 export default router;
