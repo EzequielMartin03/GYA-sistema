@@ -5,9 +5,18 @@ import userRouter from './routes/user.route.js';
 import alumnoRouter from './routes/alumno.route.js';
 import profesorRouter from './routes/profesor.route.js';
 import cursoRouter from './routes/curso.route.js';
+import cors from "cors"
 // import materialRouter from './routes/material.route.js';
 
 const app = express();
+
+app.use(
+  cors({
+    origin: ["http://localhost:5173"], 
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -19,5 +28,8 @@ app.use('/api/v1/cursos', cursoRouter);
 // app.use('/api/v1/materiales', materialRouter);
 
 const PORT = process.env.PORT || 3000;
+
+
+
 
 app.listen(PORT, () => console.log('Servidor andando en ' + PORT));

@@ -11,21 +11,21 @@ export const ProfesorModel = {
     return result.rows[0];
   },
 
-  async create({ nombre, apellido, dni }) {
+  async create({ nombre, apellido, dni, telefono, email }) {
     const result = await db.query(
-      `INSERT INTO profesor (nombre, apellido, dni)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [nombre, apellido, dni]
+      `INSERT INTO profesor (nombre, apellido, dni, telefono, email)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [nombre, apellido, dni,telefono, email]
     );
     return result.rows[0];
   },
 
-  async update(id_profesor, { nombre, apellido, dni }) {
+  async update(id_profesor, { nombre, apellido, dni, telefono, email }) {
     const result = await db.query(
       `UPDATE profesor
-       SET nombre = $1, apellido = $2, dni = $3
-       WHERE id_profesor = $4 RETURNING *`,
-      [nombre, apellido, dni, id_profesor]
+       SET nombre = $1, apellido = $2, dni = $3, telefono = $4, email = $5
+       WHERE id_profesor = $6 RETURNING *`,
+      [nombre, apellido, dni, telefono, email, id_profesor]
     );
     return result.rows[0];
   },

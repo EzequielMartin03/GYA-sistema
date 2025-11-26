@@ -28,9 +28,9 @@ const obtenerprofesor = async (req, res) => {
 
 const crearprofesor = async (req, res) => {
   try {
-    const { nombre, apellido, dni } = req.body;
+    const { nombre, apellido, dni, telefono, email } = req.body;
 
-    if (!nombre || !apellido || !dni) {
+    if (!nombre || !apellido || !dni || !telefono || !email) {
       return res
         .status(400)
         .json({ ok: false, msg: "Faltan datos obligatorios" });
@@ -40,6 +40,8 @@ const crearprofesor = async (req, res) => {
       nombre,
       apellido,
       dni,
+      telefono,
+      email
     });
 
     return res.status(201).json({ ok: true, profesor: nuevoprofesor });
