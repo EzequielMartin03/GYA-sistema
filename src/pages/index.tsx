@@ -7,6 +7,7 @@ import ErrorDetail from "./ErrorDetail";
 import { Children } from "react";
 import Dashboard from "./Dashboard/Dashboard";
 import Home from "./Home";
+import Login from "./Login/Login";
 
 const router = createBrowserRouter([
   {
@@ -22,8 +23,10 @@ const router = createBrowserRouter([
       { path: "/alumnos", element: <Alumnos /> },
       { path: "/profesores", element: <Profesores /> },
       { path: "/cursos", element: <Cursos /> },
+      
     ],
   },
+  { path: "/login", element: <Login /> },
 ]);
 
 export default router;
