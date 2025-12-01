@@ -52,7 +52,6 @@ export const CursoModel = {
     return rows;
   },
 
-  // Inscribir un alumno a un curso
   async inscribirAlumno({ id_alumno, id_curso }) {
     const query = `
       INSERT INTO alumno_curso (id_alumno, id_curso)
@@ -63,7 +62,6 @@ export const CursoModel = {
     return rows[0];
   },
 
-  // Eliminar inscripción de un alumno
   async eliminarInscripcion(id_alumno, id_curso) {
     const query = `
       DELETE FROM alumno_curso

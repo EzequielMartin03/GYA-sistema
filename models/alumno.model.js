@@ -11,21 +11,21 @@ export const AlumnoModel = {
     return result.rows[0];
   },
 
-  async create({ nombre, apellido, dni }) {
+  async create({ nombre, apellido, dni, fecha_nacimiento}) {
     const result = await db.query(
-      `INSERT INTO alumno (nombre, apellido, dni)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [nombre, apellido, dni]
+      `INSERT INTO alumno (nombre, apellido, dni, fecha_nacimiento)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [nombre, apellido, dni, fecha_nacimiento]
     );
     return result.rows[0];
   },
 
-  async update(id_alumno, { nombre, apellido, dni }) {
+  async update(id_alumno, { nombre, apellido, dni, fecha_nacimiento }) {
     const result = await db.query(
       `UPDATE alumno
-       SET nombre = $1, apellido = $2, dni = $3
-       WHERE id_alumno = $4 RETURNING *`,
-      [nombre, apellido, dni, id_alumno]
+       SET nombre = $1, apellido = $2, dni = $3, fecha_nacimiento = $4
+       WHERE id_alumno = $5 RETURNING *`,
+      [nombre, apellido, dni, fecha_nacimiento, id_alumno]
     );
     return result.rows[0];
   },

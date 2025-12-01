@@ -1,4 +1,6 @@
 import { AlumnoModel } from "../models/alumno.model.js";
+import { CondicionMedicaModel } from "../models/condicion_medica.model.js";
+
 
 const listarAlumnos = async (req, res) => {
   try {
@@ -28,19 +30,34 @@ const obtenerAlumno = async (req, res) => {
 
 const crearAlumno = async (req, res) => {
   try {
-    const { nombre, apellido, dni } = req.body;
+    const {
+      nombre,
+      apellido,
+      dni,
+      fecha_nacimiento,
+      ficha_medica
+    } = req.body;
 
-    if (!nombre || !apellido || !dni) {
-      return res
-        .status(400)
-        .json({ ok: false, msg: "Faltan datos obligatorios" });
+    if (!nombre || !apellido || !dni || !fecha_nacimiento) {
+      return res.status(400).json({ ok: false, msg: "Faltan datos obligatorios" });
     }
 
     const nuevoAlumno = await AlumnoModel.create({
       nombre,
       apellido,
       dni,
+      fecha_nacimiento
     });
+
+    if (ficha_medica) {
+
+      const condicion = await CondicionMedicaModel.crearCondicionMedica(ficha_medica);
+
+      await CondicionMedicaModel.relacionAlumnoCondicion(
+        nuevoAlumno.id_alumno,
+        condicion.id_condicion_medica
+      );
+    }
 
     return res.status(201).json({ ok: true, alumno: nuevoAlumno });
   } catch (error) {
@@ -52,13 +69,44 @@ const crearAlumno = async (req, res) => {
 const editarAlumno = async (req, res) => {
   try {
     const { id_alumno } = req.params;
-    const alumnoActualizado = await AlumnoModel.update(id_alumno, req.body);
+    const {
+      nombre,
+      apellido,
+      dni,
+      fecha_nacimiento,
+      ficha_medica
+    } = req.body;
+
+    const alumnoActualizado = await AlumnoModel.update(id_alumno, {
+      nombre,
+      apellido,
+      dni,
+      fecha_nacimiento
+    });
 
     if (!alumnoActualizado) {
       return res.status(404).json({ ok: false, msg: "Alumno no encontrado" });
     }
 
+    if (ficha_medica) {
+      const fichaExistente = await CondicionMedicaModel.obtenerPorAlumno(id_alumno);
+
+      if (fichaExistente) {
+        await CondicionMedicaModel.actualizarCondicion(
+          fichaExistente.id_condicion_medica,
+          ficha_medica
+        );
+      } else {
+        const nuevaFicha = await CondicionMedicaModel.crearCondicionMedica(ficha_medica);
+        await CondicionMedicaModel.relacionAlumnoCondicion(
+          id_alumno,
+          nuevaFicha.id_condicion_medica
+        );
+      }
+    }
+
     return res.json({ ok: true, alumno: alumnoActualizado });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ ok: false, msg: "Error server" });

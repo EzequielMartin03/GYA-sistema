@@ -7,8 +7,8 @@ const connectionString = process.env.DATABASE_URL
 
 export const db = new Pool({
     allowExitOnIdle: true,
-    connectionString
-})
+    connectionString: process.env.DATABASE_URL
+});
 
 try {
     await db.query('SELECT NOW()') 
