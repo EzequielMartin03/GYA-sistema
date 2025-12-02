@@ -33,7 +33,9 @@ const crearCurso = async (req, res) => {
     const { nombre, anio_lectivo, nivel } = req.body;
 
     if (!nombre || !anio_lectivo || !nivel) {
-      return res.status(400).json({ ok: false, msg: "Faltan datos obligatorios" });
+      return res
+        .status(400)
+        .json({ ok: false, msg: "Faltan datos obligatorios" });
     }
 
     const nuevoCurso = await CursoModel.create({ nombre, anio_lectivo, nivel });
@@ -74,58 +76,68 @@ const eliminarCurso = async (req, res) => {
     console.error(error);
     return res.status(500).json({ ok: false, msg: "Error en el servidor" });
   }
-}
+};
 
 const listarAlumnosPorCurso = async (req, res) => {
-    try {
-      const { id_curso } = req.params;
-      const alumnos = await CursoModel.findAlumnosByCurso(id_curso);
+  try {
+    const { id_curso } = req.params;
+    const alumnos = await CursoModel.findAlumnosByCurso(id_curso);
 
-      if (alumnos.length === 0) {
-        return res.status(404).json({ ok: false, msg: "No hay alumnos inscriptos en este curso" });
-      }
-
-      return res.json({ ok: true, alumnos });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ ok: false, msg: "Error en el servidor" });
+    if (alumnos.length === 0) {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "No hay alumnos inscriptos en este curso" });
     }
+
+    return res.json({ ok: true, alumnos });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ ok: false, msg: "Error en el servidor" });
   }
+};
 
-  // Inscribir alumno
-  const inscribirAlumno = async (req, res) => {
-    try {
-      const { id_alumno, id_curso } = req.body;
+const inscribirAlumno = async (req, res) => {
+  try {
+    const { id_alumno, id_curso } = req.body;
 
-      if (!id_alumno || !id_curso) {
-        return res.status(400).json({ ok: false, msg: "Faltan datos obligatorios" });
-      }
-
-      const nuevaInscripcion = await CursoModel.inscribirAlumno({ id_alumno, id_curso });
-      return res.status(201).json({ ok: true, inscripcion: nuevaInscripcion });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ ok: false, msg: "Error en el servidor" });
+    if (!id_alumno || !id_curso) {
+      return res
+        .status(400)
+        .json({ ok: false, msg: "Faltan datos obligatorios" });
     }
+
+    const nuevaInscripcion = await CursoModel.inscribirAlumno({
+      id_alumno,
+      id_curso,
+    });
+    return res.status(201).json({ ok: true, inscripcion: nuevaInscripcion });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ ok: false, msg: "Error en el servidor" });
   }
+};
 
-  // Eliminar inscripción
-  const eliminarInscripcion = async (req, res) => {
-    try {
-      const { id_alumno, id_curso } = req.params;
+const eliminarInscripcion = async (req, res) => {
+  try {
+    const { id_alumno, id_curso } = req.params;
 
-      const inscripcionEliminada = await CursoModel.eliminarInscripcion(id_alumno, id_curso);
+    const inscripcionEliminada = await CursoModel.eliminarInscripcion(
+      id_alumno,
+      id_curso
+    );
 
-      if (!inscripcionEliminada) {
-        return res.status(404).json({ ok: false, msg: "Inscripción no encontrada" });
-      }
-
-      return res.json({ ok: true, msg: "Inscripción eliminada correctamente" });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ ok: false, msg: "Error en el servidor" });
+    if (!inscripcionEliminada) {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "Inscripción no encontrada" });
     }
+
+    return res.json({ ok: true, msg: "Inscripción eliminada correctamente" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ ok: false, msg: "Error en el servidor" });
   }
+};
 
 export const CursoController = {
   listarCursos,
@@ -135,5 +147,5 @@ export const CursoController = {
   eliminarCurso,
   listarAlumnosPorCurso,
   inscribirAlumno,
-  eliminarInscripcion
+  eliminarInscripcion,
 };
